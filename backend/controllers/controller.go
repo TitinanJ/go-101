@@ -13,7 +13,7 @@ type Todo struct {
 }
 
 func GetTodoList(w http.ResponseWriter, r *http.Request) {
-    rows, err := database.DB.Query("SELECT * FROM todos")
+    rows, err := database.DB.Query("SELECT * FROM todos ORDER BY id DESC")
 	if err != nil {
 		http.Error(w, "db error", 500)
 		return

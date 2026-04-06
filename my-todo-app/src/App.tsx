@@ -60,7 +60,7 @@ function App() {
 
       const newTodo: Todo = await res.json();
 
-      setTodos((prev) => [...prev, newTodo]);
+      setTodos((prev) => [newTodo, ...prev]);
       setText("");
     } catch {
       setError("Cannot add todo");
