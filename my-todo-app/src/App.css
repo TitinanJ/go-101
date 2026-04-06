@@ -119,7 +119,6 @@ h1 {
 }
 
 .done {
-  text-decoration: line-through;
   color: #c4b9a8 !important;
 }
 
@@ -138,6 +137,19 @@ h1 {
 .todo-item button:hover {
   color: #c0533a;
   background: #fdf0ed;
+}
+
+.todo-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.todo-row input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
 }
 
 .message {

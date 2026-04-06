@@ -3,11 +3,11 @@ import "./App.css";
 
 type Todo = {
   id: number;
-  text: string;
+  task: string;
   done: boolean;
 };
 
-const API_URL = "http://localhost:8080/todos";
+const API_URL = "http://localhost:3000/todo";
 
 function App() {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -20,17 +20,14 @@ function App() {
       setLoading(true);
       setError("");
 
-      const response = await fetch(API_URL);
+      const res = await fetch(API_URL);
 
-      if (!response.ok) {
-        throw new Error("Failed to load todos");
-      }
+      if (!res.ok) throw new Error();
 
-      const data: Todo[] = await response.json();
+      const data: Todo[] = await res.json();
       setTodos(data);
-    } catch (err) {
+    } catch {
       setError("Cannot load todos");
-      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -43,53 +40,53 @@ function App() {
   const handleAddTodo = async (e: FormEvent) => {
     e.preventDefault();
 
-    const trimmedText = text.trim();
-
-    if (!trimmedText) return;
+    const trimmed = text.trim();
+    if (!trimmed) return;
 
     try {
       setError("");
 
-      const response = await fetch(API_URL, {
+      const res = await fetch(API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          text: trimmedText,
+          task: trimmed,
+          done: false,
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to add todo");
-      }
+      if (!res.ok) throw new Error();
 
-      const newTodo: Todo = await response.json();
+      const newTodo: Todo = await res.json();
 
       setTodos((prev) => [...prev, newTodo]);
       setText("");
-    } catch (err) {
+    } catch {
       setError("Cannot add todo");
-      console.error(err);
     }
   };
 
-  const handleDeleteTodo = async (id: number) => {
+  const handleToggle = async (todo: Todo) => {
     try {
-      setError("");
-
-      const response = await fetch(`${API_URL}/${id}`, {
-        method: "DELETE",
+      const res = await fetch(`${API_URL}/${todo.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          done: !todo.done,
+        }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to delete todo");
-      }
+      if (!res.ok) throw new Error();
 
-      setTodos((prev) => prev.filter((todo) => todo.id !== id));
-    } catch (err) {
-      setError("Cannot delete todo");
-      console.error(err);
+      setTodos((prev) =>
+        prev.map((t) => (t.id === todo.id ? { ...t, done: !t.done } : t)),
+      );
+    } catch {
+      setError("Cannot update todo");
     }
   };
 
@@ -97,12 +94,12 @@ function App() {
     <div className="app">
       <div className="todo-card">
         <h1>My To Do App</h1>
-        <p className="subtitle">React Frontend for Go Backend</p>
+        <p className="subtitle">React + Go Backend</p>
 
         <form onSubmit={handleAddTodo} className="todo-form">
           <input
             type="text"
-            placeholder="Enter a new task"
+            placeholder="Enter task..."
             value={text}
             onChange={(e) => setText(e.target.value)}
           />
@@ -119,8 +116,14 @@ function App() {
         <ul className="todo-list">
           {todos.map((todo) => (
             <li key={todo.id} className="todo-item">
-              <span className={todo.done ? "done" : ""}>{todo.text}</span>
-              <button onClick={() => handleDeleteTodo(todo.id)}>Delete</button>
+              <label className="todo-row">
+                <input
+                  type="checkbox"
+                  checked={todo.done}
+                  onChange={() => handleToggle(todo)}
+                />
+                <span className={todo.done ? "done" : ""}>{todo.task}</span>
+              </label>
             </li>
           ))}
         </ul>
