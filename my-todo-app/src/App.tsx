@@ -1,5 +1,4 @@
 import { useEffect, useState, type FormEvent } from "react";
-import "./App.css";
 
 type Todo = {
   id: number;
@@ -70,6 +69,8 @@ function App() {
 
   const handleToggle = async (todo: Todo) => {
     try {
+      setError("");
+
       const res = await fetch(`${API_URL}/${todo.id}`, {
         method: "PATCH",
         headers: {
@@ -91,38 +92,68 @@ function App() {
   };
 
   return (
-    <div className="app">
-      <div className="todo-card">
-        <h1>My To Do App</h1>
-        <p className="subtitle">React + Go Backend</p>
+    <div className="min-h-screen bg-stone-100 px-6 py-10 flex items-center justify-center">
+      <div className="w-full max-w-lg rounded-3xl border border-black/10 bg-stone-50 p-8 shadow-[0_2px_0_rgba(0,0,0,0.06),0_12px_40px_rgba(0,0,0,0.07)]">
+        <h1 className="text-4xl font-serif text-stone-900 tracking-tight">
+          My To Do App
+        </h1>
 
-        <form onSubmit={handleAddTodo} className="todo-form">
+        <p className="mt-1 mb-7 text-[11px] uppercase tracking-[0.18em] text-stone-400">
+          React + Go Backend
+        </p>
+
+        <form onSubmit={handleAddTodo} className="mb-6 flex gap-2">
           <input
             type="text"
             placeholder="Enter task..."
             value={text}
             onChange={(e) => setText(e.target.value)}
+            className="flex-1 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm text-stone-900 outline-none placeholder:text-stone-300 focus:border-amber-700 focus:ring-4 focus:ring-amber-700/10"
           />
-          <button type="submit">Add</button>
+          <button
+            type="submit"
+            className="rounded-xl bg-stone-900 px-5 py-2.5 text-sm font-medium text-stone-50 transition hover:bg-stone-800 active:scale-95"
+          >
+            Add
+          </button>
         </form>
 
-        {loading && <p className="message">Loading...</p>}
-        {error && <p className="message error">{error}</p>}
-
-        {!loading && todos.length === 0 && (
-          <p className="message">No todos yet</p>
+        {loading && (
+          <p className="py-4 text-center text-sm text-stone-400">Loading...</p>
         )}
 
-        <ul className="todo-list">
+        {error && (
+          <p className="rounded-lg bg-red-50 px-4 py-3 text-center text-sm text-red-500">
+            {error}
+          </p>
+        )}
+
+        {!loading && todos.length === 0 && (
+          <p className="py-4 text-center text-sm text-stone-400">
+            No todos yet
+          </p>
+        )}
+
+        <ul className="mt-2 list-none p-0">
           {todos.map((todo) => (
-            <li key={todo.id} className="todo-item">
-              <label className="todo-row">
+            <li
+              key={todo.id}
+              className="border-b border-black/5 py-3 last:border-b-0"
+            >
+              <label className="flex w-full cursor-pointer items-center gap-3">
                 <input
                   type="checkbox"
                   checked={todo.done}
                   onChange={() => handleToggle(todo)}
+                  className="h-4 w-4 cursor-pointer rounded border-stone-300 accent-stone-900"
                 />
-                <span className={todo.done ? "done" : ""}>{todo.task}</span>
+                <span
+                  className={`flex-1 wrap-break-words text-sm ${
+                    todo.done ? "text-stone-300" : "text-stone-900"
+                  }`}
+                >
+                  {todo.task}
+                </span>
               </label>
             </li>
           ))}
